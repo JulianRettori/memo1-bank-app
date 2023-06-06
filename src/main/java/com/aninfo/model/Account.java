@@ -1,5 +1,4 @@
 package com.aninfo.model;
-
 import javax.persistence.*;
 
 @Entity
@@ -11,11 +10,13 @@ public class Account {
 
     private Double balance;
 
-    public Account(){
-    }
 
     public Account(Double balance) {
         this.balance = balance;
+    }
+
+    public Account() {
+
     }
 
     public Long getCbu() {

@@ -1,7 +1,9 @@
 package com.aninfo;
 
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction;
 import com.aninfo.service.AccountService;
+import com.aninfo.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,6 +29,9 @@ public class Memo1BankApp {
 	@Autowired
 	private AccountService accountService;
 
+    @Autowired
+    private TransactionService transactionService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(Memo1BankApp.class, args);
 	}
@@ -40,6 +45,21 @@ public class Memo1BankApp {
 	@GetMapping("/accounts")
 	public Collection<Account> getAccounts() {
 		return accountService.getAccounts();
+	}
+
+    @GetMapping("/accounts/transactions")
+    public Collection<Transaction> getTransactions() {
+        return transactionService.getTransactions();
+    }
+
+	@GetMapping("/accounts/transaction/{id}")
+	public Optional<Transaction> getTransaction(Long id) {
+		return transactionService.getTransactionById(id);
+	}
+
+	@GetMapping("/accounts/transaction/{cbu}")
+	public Collection<Transaction> getTransactionsByCbu(Long cbu) {
+		return transactionService.getTransactionsByCbu(cbu);
 	}
 
 	@GetMapping("/accounts/{cbu}")
@@ -65,13 +85,20 @@ public class Memo1BankApp {
 		accountService.deleteById(cbu);
 	}
 
+	@DeleteMapping("/accounts/transactions/{id}")
+	public void deleteTransaction(@PathVariable Long id) {
+		transactionService.deleteById(id);
+	}
+
 	@PutMapping("/accounts/{cbu}/withdraw")
 	public Account withdraw(@PathVariable Long cbu, @RequestParam Double sum) {
-		return accountService.withdraw(cbu, sum);
+		transactionService.save(new Transaction("Withdraw", sum, cbu));
+        return accountService.withdraw(cbu, sum);
 	}
 
 	@PutMapping("/accounts/{cbu}/deposit")
 	public Account deposit(@PathVariable Long cbu, @RequestParam Double sum) {
+        transactionService.save(new Transaction("Deposit", sum, cbu));
 		return accountService.deposit(cbu, sum);
 	}
 
